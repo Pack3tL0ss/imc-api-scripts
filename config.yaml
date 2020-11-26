@@ -1,0 +1,9 @@
+imc:
+  user: wade
+  pass: 'hpIMC!!!'
+  address: 'imc.kabrew.com'
+  port: '443'
+  ssl: true
+  logparse:
+    user: svc-acc-imc
+    file: in/imcupgdm.2020-11-17.txt
