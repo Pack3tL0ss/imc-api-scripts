@@ -2,12 +2,11 @@ from imcapicli import config, imc
 from pathlib import Path
 from typing import Union
 import typer
-
+import json
 
 app = typer.Typer()
 
 
-IMC_USER = "svc-acc-imc"
 DEVICES = {}
 DEV_ID_MATCH = ["dev_id:", " ID: ", "DevID=", ",devID=", "Device Id:", "dev id: "]
 DEV_IP_MATCH = ["ip: ", "DevIP =", "dev_ip ="]
@@ -123,6 +122,7 @@ class ImcDev:
 
 # cli script output
 def get_cli_output():
+    lines = get_lines()
     _print = False
     for line in lines:
         if _print and line.strip() != "":
@@ -177,6 +177,7 @@ def get_threads() -> list:
     cur_thread = 0
     threads = []
     children = []
+    lines = get_lines()
     for line in lines:
         if "THREAD(" in line:
             _thread = line.split("THREAD(")[-1].split(")")[0]
@@ -247,6 +248,7 @@ def get_error_by_dev(dev_ip: str = None, dev_id: str = None) -> list:
     threads = []
     children = []
     dev_results = None
+    lines = get_lines()
     for idx, line in enumerate(lines):
         if "THREAD(" in line:
             _thread = line.split("THREAD(")[-1].split(")")[0]
@@ -298,6 +300,7 @@ def _init_DEVICES(lines: list) -> list:
     return DEVICES
 
 def get_all_lines(include: str = None, exclude: str = None):
+    lines = get_lines()
     if exclude and include:
         print("".join([f'{idx}. {line}' for idx, line in enumerate(lines) if line.strip() != ""
                        and exclude not in line and include in line]))
@@ -366,9 +369,9 @@ def get_cli_errors(include: str = typer.Argument(None), exclude: str = typer.Arg
                 _capture = False
 
     print(v1_cnt)
-    cfg = config.config.get("imc")
-    imc_dev_list = imc.device.get_all_devs(config.imc.creds, config.imc.url, by_id=True, verify=False)
-    return {dev: (input_params, id_map.get(dev, "")) for dev in v1_devs}
+    # cfg = config.config.get("imc")
+    # imc_dev_list = imc.device.get_all_devs(config.imc.creds, config.imc.url, by_id=True, verify=False)
+    typer.echo_via_pager(json.dumps({dev: (input_params, id_map.get(dev, "")) for dev in v1_devs}, indent=4))
 
 
 
