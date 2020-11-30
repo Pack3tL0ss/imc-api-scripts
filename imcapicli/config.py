@@ -14,6 +14,7 @@ REQUIRED_CONFIG = ["user", "pass", "address"]
 class Config:
     def __init__(self):
         BASE_DIR = Path(__file__).parent.parent
+        print(BASE_DIR)
         self.yaml_config = BASE_DIR.joinpath('config.yaml')
         self.config = self.get_yaml_file(self.yaml_config) or {}
         self.DEBUG = self.config.get("debug", os.getenv("DEBUG", False))
