@@ -1,9 +1,10 @@
-imc:
-  user: wade
-  pass: 'yourpasshere'
-  address: 'imc.consolepi.org'
-  port: '443'
-  ssl: true
-  logparse:
-    user: svc-acc-imc
-    file: in/imcupgdm.2020-11-17.txt
+---
+imc:                                    # required imc main key, all settings for imc are indented below (2 spaces per yaml spec)
+  user: wade                            # username with ability to access imc API
+  pass: 'yourpasshere'                  # password
+  address: 'imc.consolepi.org'          # fqdn or ip address of IMC server
+  port: '443'                           # port used to access IMC via http/https
+  ssl: true                             # use https if true, http if false (cert validation is disabled for https)
+  logparse:                             # required logparse sub-key
+    user: imc-svc-user                  # The username imc utilizes to gain CLI access to managed devices
+    file: in/imcupgdm.2020-11-17.txt    # The logfile to parse (best to place in the in subdirectory as it's ignored by git)
