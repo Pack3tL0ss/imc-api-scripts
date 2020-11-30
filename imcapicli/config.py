@@ -9,11 +9,11 @@ import yaml
 import os
 
 REQUIRED_CONFIG = ["user", "pass", "address"]
+BASE_DIR = Path(__file__).parent.parent
+yaml_config = BASE_DIR.joinpath('config.yaml')
 
 class Config:
     def __init__(self):
-        BASE_DIR = Path(__file__).parent.parent
-        yaml_config = BASE_DIR.joinpath('config.yaml')
         self.config = self.get_yaml_file(yaml_config) or {}
         self.DEBUG = self.config.get("debug", os.getenv("DEBUG", False))
         self.imc = self.get_imc_auth()
@@ -47,7 +47,7 @@ class Config:
         config = self.config.get("imc", {})
         _missing = [k for k in REQUIRED_CONFIG if k not in config]
         if _missing:
-            print(f"Required Configuration item {_missing} is missing from {self.yaml_config}")
+            print(f"Required Configuration item {_missing} is missing from {yaml_config}")
             return
         elif not config.get("port") and not config.get("ssl") and not config["address"].startswith("http"):
             print(f"'port' and 'ssl' config values missing from {self.yaml_config} this is only allowed if the configured 'address'\n"
