@@ -302,23 +302,24 @@ def _init_DEVICES(lines: list) -> list:
 
     return DEVICES
 
+@app.command()
 def get_all_lines(include: str = None, exclude: str = None):
     lines = get_lines()
     if exclude and include:
-        print("".join([f'{idx}. {line}' for idx, line in enumerate(lines) if line.strip() != ""
-                       and exclude not in line and include in line]))
+        typer.echo_via_pager("".join([f'{idx}. {line}' for idx, line in enumerate(lines) if line.strip() != ""
+                             and exclude not in line and include in line]))
     elif include:
-        print("".join([f'{idx}. {line}' for idx, line in enumerate(lines) if line.strip() != ""
-                       and include in line]))
+        typer.echo_via_pager("".join([f'{idx}. {line}' for idx, line in enumerate(lines) if line.strip() != ""
+                            and include in line]))
     elif exclude:
-        print("".join([f'{idx}. {line}' for idx, line in enumerate(lines) if line.strip() != ""
-                       and exclude not in line]))
+        typer.echo_via_pager("".join([f'{idx}. {line}' for idx, line in enumerate(lines) if line.strip() != ""
+                             and exclude not in line]))
     else:
         if not include and not exclude:
-            print("".join([f'{idx}. {line}' for idx, line in enumerate(lines) if line.strip() != ""]))
+            typer.echo_via_pager("".join([f'{idx}. {line}' for idx, line in enumerate(lines) if line.strip() != ""]))
 
 @app.command()
-def get_v1_devs(include: str = typer.Argument(None), exclude: str = typer.Argument(None)) -> list:
+def get_v1_devs() -> list:
     outfile = Path(__file__).parent.joinpath("out", "ssh_v1_devices.cfg")
     # typer.echo(f"outfile: {outfile.resolve()}")
     _capture = False
