@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+# Copyright (c) 2020 wade
+#
+# This software is released under the MIT License.
+# https://opensource.org/licenses/MIT
+
 
 from imcapicli import config, imc
 from pathlib import Path
