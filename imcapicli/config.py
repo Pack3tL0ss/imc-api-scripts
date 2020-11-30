@@ -46,18 +46,18 @@ class Config:
                 Completed digest authentication attributes.
         '''
         if not self.config:
-            print(f"Config file: {self.yaml_config} not found or invalid.")
+            print(f"!!! Config file: {self.yaml_config} not found or invalid.")
             return
         config = self.config.get("imc")
         if not config:
-            print(f"imc section missing from {self.yaml_config}")
+            print(f"!!! imc section missing from {self.yaml_config}")
             return
         _missing = [k for k in REQUIRED_CONFIG if k not in config]
         if _missing:
-            print(f"Required Configuration item {_missing} is missing from {self.yaml_config}")
+            print(f"!!! Required Configuration item {_missing} is missing from {self.yaml_config}")
             return
         elif not config.get("port") and not config.get("ssl") and not config["address"].startswith("http"):
-            print(f"'port' and 'ssl' config values missing from {self.yaml_config} this is only allowed if the configured 'address'\n"
+            print(f"!!! 'port' and 'ssl' config values missing from {self.yaml_config} this is only allowed if the configured 'address'\n"
                   "includes the protocol i.e. (https://imc.consolepi.org)")
             return
         else:
