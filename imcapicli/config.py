@@ -46,7 +46,13 @@ class Config:
             IMCAuth: pyhpeimc.auth.IMCAuth object
                 Completed digest authentication attributes.
         '''
-        config = self.config.get("imc", {})
+        if not self.config:
+            print(f"Config file: {self.yaml_config} not found or invalid.")
+            return
+        config = self.config.get("imc")
+        if not config:
+            print(f"imc section missing from {self.yaml_config}")
+            return
         _missing = [k for k in REQUIRED_CONFIG if k not in config]
         if _missing:
             print(f"Required Configuration item {_missing} is missing from {self.yaml_config}")
