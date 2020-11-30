@@ -316,7 +316,7 @@ def get_all_lines(include: str = None, exclude: str = None):
 @app.command()
 def get_v1_devs(include: str = typer.Argument(None), exclude: str = typer.Argument(None)) -> list:
     outfile = Path(__file__).parent.joinpath("out", "ssh_v1_devices.cfg")
-    typer.echo(f"outfile: {outfile.resolve()}")
+    # typer.echo(f"outfile: {outfile.resolve()}")
     _capture = False
     id_map = {}
     v1_devs = []
