@@ -15,7 +15,7 @@ def get_lines(file: Path = None):
     if file is None:
         parse_file = config.config.get("imc", {}).get("logparse", {}).get("file")
         if not parse_file:
-            typer.Error("no logparse file defined in config")
+            typer.echo("no logparse file defined in config")
             typer.Exit(1)
             return  # return can't be hit just squelching maybe unbound errors for f below
         else:
@@ -28,7 +28,7 @@ def get_lines(file: Path = None):
             lines = _f.readlines()
         return lines
     else:
-        typer.Error(f"{f} File Not Found")
+        typer.echo(f"{f} File Not Found")
         typer.Exit(1)
 
 
@@ -139,7 +139,7 @@ def get_device_errors(error: str = typer.Argument(None)):
     cfg = config.config.get('imc', {}).get('logparse', {})
     parse_user = cfg.get('user')
     if not parse_user:
-        typer.Error("imc, logparse, user is missing in config, this is the user IMC uses to log into devices")
+        typer.echo("imc, logparse, user is missing in config, this is the user IMC uses to log into devices")
         typer.Exit(1)
 
     lines = get_lines()
