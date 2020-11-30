@@ -335,12 +335,12 @@ def get_v1_devs(include: str = typer.Argument(None), exclude: str = typer.Argume
             v1_devs.append(int.from_bytes(bytes.fromhex(line.strip().split("'")[1]), "big"))
             _capture = False
 
-    print(v1_cnt)
     imc_dev_dict = imc.device.get_all_devs(config.imc.creds, config.imc.url, by_id=True, verify=False)
     with outfile.open("w") as f:
         f.writelines("\n".join([imc_dev_dict.get(dev, {}).get('ip', f"Error: ip for device with id {dev} not found.") for dev in v1_devs]))
     typer.echo("\n".join([f"{dev}: {imc_dev_dict.get(dev, {}).get('label', '')}({imc_dev_dict.get(dev, {}).get('ip', 'Error ip Not Found')})"
                           for dev in v1_devs]))
+    typer.echo(f"\nFound {v1_cnt} devices with errors indicating they require SSHv1 (parsed from log).")
 
 
 @app.command()
