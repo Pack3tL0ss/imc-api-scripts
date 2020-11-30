@@ -317,11 +317,15 @@ def get_all_lines(include: str = None, exclude: str = None):
 @app.command()
 def get_v1_devs(include: str = typer.Argument(None), exclude: str = typer.Argument(None)) -> list:
     outfile = Path(__file__).parent.joinpath("out", "ssh_v1_devices.cfg")
+    typer.echo(f"outfile: {outfile}")
     _capture = False
     id_map = {}
     v1_devs = []
     v1_cnt = 0
     lines = get_lines()
+    if not lines():
+        typer.secho("No SSH V1 errors returned from config", fg=typer.colors.MAGENTA)
+        return
     for line in lines:
         if "dev id:" in line and "ip:" in line:
             _ip = line.split("ip: ")[-1].split(" ")[0].rstrip(".")
