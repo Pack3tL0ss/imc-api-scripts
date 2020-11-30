@@ -137,7 +137,7 @@ def get_cli_output():
         elif "Finished, result:" in line:
             _print = True
 
-@app.command()
+# @app.command()
 def get_device_errors(error: str = typer.Argument(None)):
     cfg = config.config.get('imc', {}).get('logparse', {})
     parse_user = cfg.get('user')
@@ -356,7 +356,7 @@ def get_v1_devs(include: str = typer.Argument(None), exclude: str = typer.Argume
         typer.echo(f"{ERR_STR} Unable to find {outfile.resolve()}\n")
 
 
-@app.command()
+# @app.command()
 def get_cli_errors(include: str = typer.Argument(None), exclude: str = typer.Argument(None)) -> list:
     lines = get_lines()
     _capture = False
