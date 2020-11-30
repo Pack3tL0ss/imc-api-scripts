@@ -8,11 +8,11 @@
 
 ## Installation
 
-- clone this repo:  `git clone https://github.com/Pack3tL0ss/imc-scripts.git`
+- clone this repo:  `git clone https://github.com/Pack3tL0ss/imc-api-scripts.git`
 - Configure VirtualEnv
 
     ```bash
-    cd imc-scripts
+    cd imc-api-scripts
     python3 -m virtualenv venv # may require full path to python3.exe on Windows if python3.exe is not in PATH
     ```
 
@@ -61,7 +61,7 @@
 
 #### Linux
 ```bash
-# From the imc-scripts directory
+# From the imc-api-scripts directory
 source venv/bin/activate
 
 # show help text with available commands
@@ -102,7 +102,7 @@ Formatted list of IPs sent to out/ssh_v1_devices.cfg
 
 #### Windows
 ```powershell
-# From the imc-scripts directory
+# From the imc-api-scripts directory
 venv\bin\Scripts\activate
 
 # show help text with available commands
