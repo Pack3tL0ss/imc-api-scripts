@@ -106,6 +106,7 @@ class MyLogger:
 
 
 _calling_script = Path(argv[0])
+print("DEBUG: ", _calling_script)
 log_file = _calling_script.joinpath(_calling_script.resolve().parent, "logs", f"{_calling_script.stem}.log")
 
 config = Config()
