@@ -345,7 +345,7 @@ def get_v1_devs(include: str = typer.Argument(None), exclude: str = typer.Argume
         with outfile.open() as f:
             _errors = [True for line in f.readlines() if line.startswith("Error")]
             if _errors:
-                typer.echo(f"WARNING: SSHv1 device IPs exported to {outfile.resolve()}, but {len(_errors)} errors were found (Unable to gather IP from from IMC) out of {v1_cnt} devices\n")
+                typer.echo(f"\nWARNING: SSHv1 device IPs exported to {outfile.resolve()}, but {len(_errors)} errors were found (Unable to gather IP from from IMC) out of {v1_cnt} devices.\n")
             else:
                 typer.echo(f"Formatted list of IPs sent to {outfile.resolve()}\n")
     else:
