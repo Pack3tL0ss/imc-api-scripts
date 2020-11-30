@@ -341,7 +341,15 @@ def get_v1_devs(include: str = typer.Argument(None), exclude: str = typer.Argume
     typer.echo("\n".join([f"{dev}: {imc_dev_dict.get(dev, {}).get('label', '')}({imc_dev_dict.get(dev, {}).get('ip', 'Error ip Not Found')})"
                           for dev in v1_devs]))
     typer.echo(f"\nFound {v1_cnt} devices with errors indicating they require SSHv1 (parsed from log).")
-    typer.echo(f"Formatted list of IPs sent to {outfile.resolve()}\n")
+    if outfile.exists():
+        with outfile.open() as f:
+            _errors = [True for line in f.readlines() if line.startswith("Error")]
+            if _errors:
+                typer.echo(f"WARNING: SSHv1 device IPs exported to {outfile.resolve()}, but {len(_errors)} errors were found (Unable to gather IP from from IMC) out of {v1_cnt} devices\n")
+            else:
+                typer.echo(f"Formatted list of IPs sent to {outfile.resolve()}\n")
+    else:
+        typer.echo(f"ERROR: Unable to find {outfile.resolve()}\n")
 
 
 @app.command()
