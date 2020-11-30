@@ -10,6 +10,8 @@ app = typer.Typer()
 DEVICES = {}
 DEV_ID_MATCH = ["dev_id:", " ID: ", "DevID=", ",devID=", "Device Id:", "dev id: "]
 DEV_IP_MATCH = ["ip: ", "DevIP =", "dev_ip ="]
+ERR_STR = typer.style("ERROR:", fg=typer.colors.RED)
+WAR_STR = typer.style("WARNING:", fg=typer.colors.YELLOW)
 
 def get_lines(file: Path = None):
     if file is None:
@@ -345,11 +347,11 @@ def get_v1_devs(include: str = typer.Argument(None), exclude: str = typer.Argume
         with outfile.open() as f:
             _errors = [True for line in f.readlines() if line.startswith("Error")]
             if _errors:
-                typer.echo(f"\nWARNING: SSHv1 device IPs exported to {outfile.resolve()}, but {len(_errors)} errors were found (Unable to gather IP from from IMC) out of {v1_cnt} devices.\n")
+                typer.echo(f"\n{WAR_STR} SSHv1 device IPs exported to {outfile.resolve()}, but {len(_errors)} errors were found (Unable to gather IP from from IMC) out of {v1_cnt} devices.\n")
             else:
                 typer.echo(f"Formatted list of IPs sent to {outfile.resolve()}\n")
     else:
-        typer.echo(f"ERROR: Unable to find {outfile.resolve()}\n")
+        typer.echo(f"{ERR_STR} Unable to find {outfile.resolve()}\n")
 
 
 @app.command()
