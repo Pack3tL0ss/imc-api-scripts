@@ -17,7 +17,7 @@ def get_lines(file: Path = None):
         if not parse_file:
             typer.echo("no logparse file defined in config")
             typer.Exit(1)
-            return  # return can't be hit just squelching maybe unbound errors for f below
+            return "exit" # return can't be hit just squelching maybe unbound errors for f below
         else:
             f = Path(parse_file)
     else:
@@ -323,8 +323,11 @@ def get_v1_devs(include: str = typer.Argument(None), exclude: str = typer.Argume
     v1_devs = []
     v1_cnt = 0
     lines = get_lines()
-    if not lines:
-        typer.secho("No SSH V1 errors returned from config", fg=typer.colors.MAGENTA)
+    if isinstance(lines, str) and lines == "exit":
+        typer.secho("return was hit", fg=typer.colors.MAGENTA)
+        return
+    elif lines is None:
+        print("NONE RETURNED")
         return
     for line in lines:
         if "dev id:" in line and "ip:" in line:
