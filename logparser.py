@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from imcapicli import config, imc
 from pathlib import Path
 from typing import Union
