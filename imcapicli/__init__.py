@@ -107,7 +107,7 @@ class MyLogger:
 
 _calling_script = Path(argv[0])
 log_file = _calling_script.joinpath(_calling_script.resolve().parent, "logs", f"{_calling_script.stem}.log")
-print("DEBUG: ", f"\n\tcalling script: {_calling_script}\n\tlog_file: {log_file}")
+# print("DEBUG: ", f"\n\tcalling script: {_calling_script}\n\tlog_file: {log_file}")
 
 # pass base_dir to Config to accomodate pyinstaller (ref to __file__ in config.py points to tmp dir when using pyinstaller generated exe)
 config = Config(base_dir=_calling_script.resolve().parent)

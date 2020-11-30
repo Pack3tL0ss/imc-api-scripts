@@ -16,8 +16,7 @@ def get_lines(file: Path = None):
         parse_file = config.config.get("imc", {}).get("logparse", {}).get("file")
         if not parse_file:
             typer.echo("no logparse file defined in config")
-            typer.Exit(1)
-            return "exit" # return can't be hit just squelching maybe unbound errors for f below
+            raise typer.Exit(code=1)
         else:
             f = Path(parse_file)
     else:
@@ -29,7 +28,7 @@ def get_lines(file: Path = None):
         return lines
     else:
         typer.echo(f"{f} File Not Found")
-        typer.Exit(1)
+        raise typer.Exit(code=1)
 
 
 class ImcDev:
@@ -140,7 +139,7 @@ def get_device_errors(error: str = typer.Argument(None)):
     parse_user = cfg.get('user')
     if not parse_user:
         typer.echo("imc, logparse, user is missing in config, this is the user IMC uses to log into devices")
-        typer.Exit(1)
+        raise typer.Exit(code=1)
 
     lines = get_lines()
     _print = False
@@ -323,12 +322,6 @@ def get_v1_devs(include: str = typer.Argument(None), exclude: str = typer.Argume
     v1_devs = []
     v1_cnt = 0
     lines = get_lines()
-    if isinstance(lines, str) and lines == "exit":
-        typer.secho("return was hit", fg=typer.colors.MAGENTA)
-        return
-    elif lines is None:
-        print("NONE RETURNED")
-        return
     for line in lines:
         if "dev id:" in line and "ip:" in line:
             _ip = line.split("ip: ")[-1].split(" ")[0].rstrip(".")
