@@ -323,7 +323,7 @@ def get_v1_devs(include: str = typer.Argument(None), exclude: str = typer.Argume
     v1_devs = []
     v1_cnt = 0
     lines = get_lines()
-    if not lines():
+    if not lines:
         typer.secho("No SSH V1 errors returned from config", fg=typer.colors.MAGENTA)
         return
     for line in lines:
