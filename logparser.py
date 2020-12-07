@@ -332,6 +332,7 @@ def get_v1_devs() -> list:
     v1_devs = []
     v1_cnt = 0
     lines = get_lines()
+    print("Parsing Log File...", end="")
     for line in lines:
         if "dev id:" in line and "ip:" in line:
             _ip = line.split("ip: ")[-1].split(" ")[0].rstrip(".")
@@ -345,6 +346,7 @@ def get_v1_devs() -> list:
             v1_devs.append(int.from_bytes(bytes.fromhex(line.strip().split("'")[1]), "big"))
             _capture = False
 
+    print(f"OK {v1_cnt} (SSHv1 devices found)")
     imc_dev_dict = imc.device.get_all_devs(config.imc.creds, config.imc.url, by_id=True, verify=False)
     with outfile.open("w") as f:
         f.writelines("\n".join([imc_dev_dict.get(dev, {}).get('ip', f"Error: ip for device with id {dev} not found.") for dev in v1_devs]))

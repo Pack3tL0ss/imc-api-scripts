@@ -11,8 +11,11 @@ of the HPE IMC NMS platform using the RESTful API
 from typing import Union
 
 import requests
+import os
 
 from pyhpeimc.auth import HEADERS
+
+DEV_SYSTEM = os.getenv("NAME") == "wellswa6"
 
 def get_all_devs(auth, url, network_address=None, category=None, label=None, start: int = 0,
                  size: int = None, order_by: str = "id", total: bool = False, by_id: bool = False,
@@ -37,7 +40,11 @@ def get_all_devs(auth, url, network_address=None, category=None, label=None, sta
             Use by_id or by_ip to get a dict keyed by device id or ip.
     '''
     base_url = "/imcrs/plat/res/device?resPrivilegeFilter=false"
-    end_url = f"&start={start}&size={size or 10}&orderBy={order_by}&desc=false&total={str(total).lower()}"
+    if DEV_SYSTEM:
+        print("Running With DEV_SYSTEM = True")
+        end_url = f"&start={start}&size={size or 10}&orderBy={order_by}&desc=false&total={str(total).lower()}"
+    else:
+        end_url = f"&start={start}&size={size or 1000}&orderBy={order_by}&desc=false&total={str(total).lower()}"
 
     network_address = '' if not network_address else f"&ip={str(network_address)}"
     label = '' if not label else f"&label={str(label)}"
@@ -46,11 +53,14 @@ def get_all_devs(auth, url, network_address=None, category=None, label=None, sta
     f_url = url + base_url + str(network_address) + str(label) + str(category) + end_url
 
     dev_details, _link = None, None
+    cnt = 1
     try:
+        print(f"Sending Request {cnt} to IMC...", end=""); cnt += 1
         response = requests.get(f_url, auth=auth, headers=HEADERS, **kwargs)
         if response.status_code == 200:
             dev_details = response.json().get("device", {})
             _link = response.json().get("link")
+            print(f"OK (details collected for {len(dev_details)} devices)")
 
         # if not called with return limits collect all devices via multiple calls if necessary
         if not size:
@@ -65,20 +75,21 @@ def get_all_devs(auth, url, network_address=None, category=None, label=None, sta
                 else:
                     print("link key in response is not as expected")
                     break
+                print(f"Sending Request {cnt} to IMC...", end=""); cnt += 1
                 response = requests.get(f_url, auth=auth, headers=HEADERS, **kwargs)
                 if response.status_code == 200:
                     _link = response.json().get("link")
-
                     dev_details = [*dev_details, *response.json().get("device", {})]
+                    print(f"OK (details collected for {len(dev_details)} devices)")
 
     except Exception as e:
         # TODD Logging and exception
-        print(e)
+        print(f"Error\n{e}")
 
     # TODO return my Response object
     if dev_details:
         if by_id:
-            return {i["id"]: i for i in dev_details}
+            return {int(i["id"]): i for i in dev_details}
         elif by_ip:
             return {i["ip"]: i for i in dev_details}
         else:
