@@ -33,12 +33,12 @@ def get_lines(file: Path = None):
     else:
         f = Path(file)
 
-    if f.exists():
+    if f.is_file() and f.stat().st_size > 0:
         with f.open() as _f:
             lines = _f.readlines()
         return lines
     else:
-        typer.echo(f"{f} File Not Found")
+        typer.echo(f"{f} File Not Found or empty")
         raise typer.Exit(code=1)
 
 
@@ -327,14 +327,17 @@ def get_all_lines(include: str = None, exclude: str = None):
 
 @app.command("sshv1")
 def get_v1_devs(developer_mode: bool = typer.Option(False, "--dev", hidden=True),
-                debug: bool = typer.Option(False, hidden=True)) -> list:
+                debug: bool = typer.Option(False, hidden=True),
+                logfile: Path = typer.Option(None, help="The logfile to parse (overrides value if provided in config)")) -> None:
     outfile = Path(__file__).parent.joinpath("out", "ssh_v1_devices.cfg")
     # typer.echo(f"outfile: {outfile.resolve()}")
     _capture = False
     id_map = {}
     v1_devs = []
     v1_cnt = 0
-    lines = get_lines()
+    if logfile and not logfile.is_file() and logfile.parent.joinpath("in", logfile.name).is_file():
+        logfile = logfile.parent / "in" / logfile.name
+    lines = get_lines(logfile)
     print("Parsing Log File...", end="")
     for line in lines:
         if "dev id:" in line and "ip:" in line:
@@ -376,7 +379,7 @@ def get_v1_devs(developer_mode: bool = typer.Option(False, "--dev", hidden=True)
     for dev in new_dict:
         tty_out += [{k: v for k, v in new_dict[dev].items() if k in out_keys}]  # convert dict to list of dicts for tabulate
         # ver_list += [f"{new_dict[dev]['currentVersion']:30}{new_dict[dev]['deviceModel']}\n"]
-        ver_list2 += [(new_dict[dev]['currentVersion'], new_dict[dev]['deviceModel'])]
+        ver_list2 += [(new_dict[dev].get('currentVersion', '--'), new_dict[dev].get('deviceModel', '--'))]
         csv_out += [",".join([v for k, v in new_dict[dev].items() if k in out_keys])]
 
     csv_out.insert(0, ",".join([k for k in tty_out[-1].keys()]))
