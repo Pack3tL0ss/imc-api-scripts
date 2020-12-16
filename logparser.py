@@ -5,8 +5,9 @@
 # https://opensource.org/licenses/MIT
 
 
+import logging
 from typer.params import Option
-from imcapicli import Response, config, imc
+from imcapicli import Response, config, imc, log
 from pathlib import Path
 from typing import Union
 import typer
@@ -24,14 +25,22 @@ WAR_STR = typer.style("WARNING:", fg=typer.colors.YELLOW)
 
 def get_lines(file: Path = None):
     if file is None:
-        parse_file = config.config.get("imc", {}).get("logparse", {}).get("file")
-        if not parse_file:
+        file = config.config.get("imc", {}).get("logparse", {}).get("file")
+        if not file:
             typer.echo("no logparse file defined in config")
             raise typer.Exit(code=1)
         else:
-            f = Path(parse_file)
+            f = Path(file)
     else:
         f = Path(file)
+
+    # allow file relative to where script ran from or relative to
+    # script dir automatically add 'in' if not in root of script dir
+    if not f.is_file():
+        if Path(Path(__file__).parent / file).is_file():
+            f = Path(__file__).parent / file
+        elif Path(Path(__file__).parent / "in" / file).is_file():
+            f = Path(__file__).parent / "in" / file
 
     if f.is_file() and f.stat().st_size > 0:
         with f.open() as _f:
@@ -328,15 +337,19 @@ def get_all_lines(include: str = None, exclude: str = None):
 @app.command("sshv1")
 def get_v1_devs(developer_mode: bool = typer.Option(False, "--dev", hidden=True),
                 debug: bool = typer.Option(False, hidden=True),
-                logfile: Path = typer.Option(None, help="The logfile to parse (overrides value if provided in config)")) -> None:
+                logfile: Path = typer.Option(None, "--in", help="The logfile to parse (overrides value if provided in config)")) -> None:
+
     outfile = Path(__file__).parent.joinpath("out", "ssh_v1_devices.cfg")
-    # typer.echo(f"outfile: {outfile.resolve()}")
+
+    if debug:
+        config.debug = log.DEBUG = log.show = debug
+        log.setLevel(logging.DEBUG)
+
     _capture = False
     id_map = {}
     v1_devs = []
     v1_cnt = 0
-    if logfile and not logfile.is_file() and logfile.parent.joinpath("in", logfile.name).is_file():
-        logfile = logfile.parent / "in" / logfile.name
+
     lines = get_lines(logfile)
     print("Parsing Log File...", end="")
     for line in lines:
@@ -385,12 +398,14 @@ def get_v1_devs(developer_mode: bool = typer.Option(False, "--dev", hidden=True)
     csv_out.insert(0, ",".join([k for k in tty_out[-1].keys()]))
 
     # Output data to screen
-    typer.echo(tabulate(tty_out, headers="keys") + "\n\n")
-    csv_out_file = Path(outfile.parent / f"{__file__}_output.csv")
+    typer.echo("\n-- Details for all devices parsed from logs with SSHv1 Error --")
+    typer.echo(tabulate(tty_out, headers="keys"))
+    csv_out_file = Path(outfile.parent / (f"{Path(__file__).stem}_output.csv"))
     csv_out_file.write_text("\n".join(csv_out))
 
     # Display all model/versions that resulted in v1 error
     # typer.echo(f"\n{typer.style('Code Versions resulting in sshv1 error:', fg='cyan')}\n{''.join(list(set(ver_list)))}")
+    typer.echo("\n-- Unique model / version combinations that returned SSHv1 Error --")
     typer.echo(tabulate(ver_list2, headers="firstrow"))
 
     typer.echo(f"\nFound {v1_cnt} devices with errors indicating they require SSHv1 (parsed from log).")
@@ -400,7 +415,7 @@ def get_v1_devs(developer_mode: bool = typer.Option(False, "--dev", hidden=True)
             if _errors:
                 typer.echo(f"\n{WAR_STR} SSHv1 device IPs exported to {outfile}, but {len(_errors)} errors were found (Unable to gather IP from from IMC) out of {v1_cnt} devices.\n")
             else:
-                typer.echo(f"Formatted list of IPs sent to {outfile}\n")
+                typer.echo(f"\nFormatted list of IPs sent to {outfile}")
                 typer.echo(f"Details for each device sent to {csv_out_file}\n")
     else:
         typer.echo(f"{ERR_STR} Unable to find {outfile.resolve()}\n")

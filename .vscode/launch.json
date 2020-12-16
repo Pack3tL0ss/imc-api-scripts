@@ -25,7 +25,7 @@
             "env":{
                 "BETTER_EXCEPTIONS": "1"
             },
-            "args": ["${input:cliArgs}"]
+            "args": ["${input:cliArgs}"],
         },
         {
             "name": "Python: Current File",
