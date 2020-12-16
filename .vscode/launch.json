@@ -3,6 +3,16 @@
     // Hover to view descriptions of existing attributes.
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
+
+    "inputs": [
+        {
+          "type": "promptString",
+          "id": "cliArgs",
+          "description": "Select Arguments",
+          // The default is updated automatically by the script, could not get vscode debugger to do it.
+          "default": "sshv1 --dev"  // VSC_PREV_ARGS
+        },
+      ],
     "configurations": [
         {
             "name": "Python: logparser",
@@ -11,10 +21,11 @@
             "program": "logparser.py",
             "console": "integratedTerminal",
             "justMyCode": false,
-            "args": ["get-v1-devs --dev"],
+            // "args": ["get-v1-devs --dev"],
             "env":{
                 "BETTER_EXCEPTIONS": "1"
-            }
+            },
+            "args": ["${input:cliArgs}"]
         },
         {
             "name": "Python: Current File",

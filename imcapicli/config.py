@@ -13,10 +13,10 @@ REQUIRED_CONFIG = ["user", "pass", "address"]
 
 class Config:
     def __init__(self, base_dir: Path = None):
-        self.BASE_DIR = base_dir or Path(__file__).parent.parent
-        self.yaml_config = self.BASE_DIR.joinpath('config.yaml')
+        self.base_dir = base_dir or Path(__file__).parent.parent
+        self.yaml_config = self.base_dir.joinpath('config.yaml')
         self.config = self.get_yaml_file(self.yaml_config) or {}
-        self.DEBUG = self.config.get("debug", os.getenv("DEBUG", False))
+        self.debug = self.config.get("debug", os.getenv("DEBUG", False))
         self.imc = self.get_imc_auth()
 
     def __bool__(self):

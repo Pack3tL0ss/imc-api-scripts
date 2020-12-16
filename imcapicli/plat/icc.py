@@ -18,6 +18,7 @@ from pyhpeimc.auth import HEADERS
 
 DEV_SYSTEM = os.getenv("NAME") == "wellswa6"
 
+# Note filter by dev_ids dev_ips not implemented yet
 def get_config_center_dict(auth, url, dev_ids: Union[List[str], str] = None,
                            dev_ips: Union[List[str], str] = None, log: Union[MyLogger, logging.Logger] = log) -> Response:
     """Get Configuration Center details for all devices in IMC.

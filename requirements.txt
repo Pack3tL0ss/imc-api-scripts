@@ -7,3 +7,4 @@ PyYAML==5.3.1
 requests==2.25.0
 typer==0.3.2
 urllib3==1.26.2
+tabulate==0.8.7
