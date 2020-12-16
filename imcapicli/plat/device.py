@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 # coding=utf-8
-# author: @netmanchris
+# author: Pack3tL0ss ~ Wade Wells
 # -*- coding: utf-8 -*-
 """
-This module contains functions for working with the device capabilities
-of the HPE IMC NMS platform using the RESTful API
-
+This module adds some new and override methods to the pyhpeimc module
 """
 
 from typing import Union

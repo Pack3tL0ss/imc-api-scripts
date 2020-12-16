@@ -11,7 +11,7 @@
             "program": "logparser.py",
             "console": "integratedTerminal",
             "justMyCode": false,
-            "args": ["get-v1-devs"],
+            "args": ["get-v1-devs --dev"],
             "env":{
                 "BETTER_EXCEPTIONS": "1"
             }

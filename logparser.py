@@ -5,11 +5,13 @@
 # https://opensource.org/licenses/MIT
 
 
-from imcapicli import config, imc
+from typer.params import Option
+from imcapicli import Response, config, imc
 from pathlib import Path
 from typing import Union
 import typer
 import json
+from tabulate import tabulate
 
 app = typer.Typer()
 
@@ -324,7 +326,8 @@ def get_all_lines(include: str = None, exclude: str = None):
             typer.echo_via_pager("".join([f'{idx}. {line}' for idx, line in enumerate(lines) if line.strip() != ""]))
 
 @app.command()
-def get_v1_devs() -> list:
+def get_v1_devs(developer_mode: bool = typer.Option(False, "--dev", hidden=True),
+                debug: bool = typer.Option(False, hidden=True)) -> list:
     outfile = Path(__file__).parent.joinpath("out", "ssh_v1_devices.cfg")
     # typer.echo(f"outfile: {outfile.resolve()}")
     _capture = False
@@ -347,11 +350,30 @@ def get_v1_devs() -> list:
             _capture = False
 
     print(f"OK {v1_cnt} (SSHv1 devices found)")
+    out_keys = ["id", "sysName", "location", "deviceModel", "currentVersion"]
     imc_dev_dict = imc.device.get_all_devs(config.imc.creds, config.imc.url, by_id=True, verify=False)
-    with outfile.open("w") as f:
-        f.writelines("\n".join([imc_dev_dict.get(dev, {}).get('ip', f"Error: ip for device with id {dev} not found.") for dev in v1_devs]))
-    typer.echo("\n".join([f"{dev}: {imc_dev_dict.get(dev, {}).get('label', '')}({imc_dev_dict.get(dev, {}).get('ip', 'Error ip Not Found')})"
-                          for dev in v1_devs]))
+    icc_dev_dict = imc.icc.get_config_center_dict(config.imc.creds, config.imc.url)
+    if developer_mode:
+        v1_devs = [k for k in imc_dev_dict.keys() if imc_dev_dict[k].get("categoryId", "") == "1"]
+        typer.secho("dev mode: ssh_v1_parse data overwritten for testing", fg="red")
+    new_dict = {dev: {**imc_dev_dict.get(dev, {}), **icc_dev_dict.get(dev, {})} for dev in v1_devs}
+    with outfile.open("w+") as f:
+        file_data = f.readlines()
+        new_fdata = [imc_dev_dict.get(dev, {}).get('ip', f"Error: ip for device with id {dev} not found.") for dev in v1_devs]
+        f.writelines("\n".join([line for line in set([*file_data, *new_fdata])]))
+    # outdata = {k: new_dict[dev][k] for dev in new_dict for k in new_dict[dev] if k in out_keys}
+    outdata = []
+    for dev in new_dict:
+        outdata += [{k: v for k, v in new_dict[dev].items() if k in out_keys}]
+
+    typer.echo(tabulate(outdata, headers="keys"))
+    #     _ = {dev: {k: v} for dev in v1_devs for k, v in {**imc_dev_dict.get(dev), **icc_dev_dict.get(dev)}}
+    # typer.echo("\n".join([f"{dev} {imc_dev_dict.get(dev, {}).get('label', '--')} ip: {imc_dev_dict.get(dev, {}).get('ip', '--')} " \
+    #                       f"version: {icc_dev_dict.get(dev, {}).get('currentVersion', '--')} " \
+    #                       f"model: {icc_dev_dict.get(dev, {}).get('deviceModel', '--')} " \
+    #                       f"location: {imc_dev_dict.get(dev, {}).get('location', '--')} " \
+    #                       f"typeName: {imc_dev_dict.get(dev, {}).get('typeName', '--')} " \
+    #                       for dev in v1_devs]))
     typer.echo(f"\nFound {v1_cnt} devices with errors indicating they require SSHv1 (parsed from log).")
     if outfile.exists():
         with outfile.open() as f:
